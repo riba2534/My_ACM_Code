@@ -134,7 +134,7 @@ void solve()
                 //如果状态k已经解决t-1个问题 且 状态k没有解决第j个问题 且 状态k已经解决了状态j的前置问题
                 if (cnt[k] == t - 1 && !((k >> j) & 1) && (k & pre[j]) == pre[j])
                 {
-                    if (k | (1 << j) >= (1 << n)) //当k状态解决j问题后所得的值 >= 总状态数就跳过，因为所有的状态一共只有(1<<n)
+                    if ((k | (1 << j)) >= (1 << n)) //当k状态解决j问题后所得的值 >= 总状态数就跳过，因为所有的状态一共只有(1<<n)
                         continue;
                     if (dp[k] + a[j] * t + b[j] >= dp[(k | (1 << j))])
                     {
@@ -150,7 +150,7 @@ void solve()
 }
 int main()
 {
-    // freopen("in.txt", "r", stdin);
+    //freopen("in.txt", "r", stdin);
     ll t, k;
     scanf("%lld", &n);
     for (ll i = 0; i < n; i++)
