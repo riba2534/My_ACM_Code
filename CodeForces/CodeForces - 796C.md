@@ -102,12 +102,66 @@
 
 给了一棵n个节点的树，每个节点有一个权值。定义两个概念:
 
-- 半相邻：i节点和j节点直接有边相连
-- 相邻：i和k有一条边,k和j有一条边则i和j相邻
+- 相邻：i节点和j节点直接有边相连
+- 半相邻：i和k有一条边,k和j有一条边则i和j相邻，**且k在线**
 
 每次挑一个节点hack掉，然后与他半相邻和相邻的所有的节点的权值会加1，然后这个点就成了`离线`状态。删点的规则是:
 
 - x点还没被删
 - x是离线的点的邻居
 - x的权值小于等于你的初始强度
+
+若当u的祖先被攻击时,u最多+2,此时它的任意子结点v,只有当u被攻击时才能被攻击,子节点对u贡献为0
+若为u的某个子树被攻击,u的其余子树和u的祖先 都只有在u被攻击时才被攻击,所以任意点u的值最多+2,ans<=mx+2 
+
+先用`multiset`插入所有的权值，对于每一个点，都暴力一下求一下当前点的`maxx`的值，最后取一个最小就是答案。暴力的方法是先从集合中删除当前点，在删除这个点的所有相连的点，求一下这个点和它的子节点的最大值加一的最大值(因为这一层最多产生贡献1)，对于剩下的点，求一个找到最大值加2，求最大值。最后把删除的点插入回来。这样每个点为根的值都可以求出来，我们求出最优的就行了。
+
+
+
+# 代码
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+const int inf = 2e9 + 10;
+const int N = 300000 + 10;
+int a[N];
+vector<int> e[N];
+multiset<int> s;
+int main()
+{
+    int n, u, v;
+    scanf("%d", &n);
+    for (int i = 1; i <= n; i++)
+    {
+        scanf("%d", &a[i]);
+        s.insert(a[i]);
+    }
+    for (int i = 1; i <= n - 1; i++)
+    {
+        scanf("%d%d", &u, &v);
+        e[u].push_back(v);
+        e[v].push_back(u);
+    }
+    int ans = inf;
+    for (int i = 1; i <= n; i++)
+    {
+        int maxx = a[i];
+        s.erase(s.find(a[i]));
+        for (auto v : e[i])
+        {
+            maxx = max(maxx, a[v] + 1);
+            s.erase(s.find(a[v]));
+        }
+        if (s.size())
+            maxx = max(maxx, *s.rbegin() + 2);
+        s.insert(a[i]);
+        for (auto v : e[i])
+            s.insert(a[v]);
+        ans = min(ans, maxx);
+    }
+    printf("%d\n", ans);
+    return 0;
+}
+```
 
